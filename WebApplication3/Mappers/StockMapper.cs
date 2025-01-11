@@ -15,4 +15,24 @@ public static class StockMapper {
             MarketCap = stock.MarketCap
         };
     }
+
+    public static Stock ToStockFromCreateDto(this CreateStockDto createStockDto) {
+        return new Stock {
+            Symbol = createStockDto.Symbol,
+            CompanyName = createStockDto.CompanyName,
+            Purchase = createStockDto.Purchase,
+            LastDir = createStockDto.LastDir,
+            Industry = createStockDto.Industry,
+            MarketCap = createStockDto.MarketCap
+        };
+    }
+
+    public static void Update(this Stock stock, UpdateStockDto updateStockDto) {
+        stock.Symbol = updateStockDto.Symbol;
+        stock.CompanyName = updateStockDto.CompanyName;
+        stock.Purchase = updateStockDto.Purchase;
+        stock.LastDir = updateStockDto.LastDir;
+        stock.Industry = updateStockDto.Industry;
+        stock.MarketCap = updateStockDto.MarketCap;
+    }
 }
