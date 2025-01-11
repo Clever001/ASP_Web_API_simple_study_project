@@ -1,6 +1,7 @@
 using api.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WebApplication3.Mappers;
 
 namespace WebApplication3.Controllers;
 
@@ -15,7 +16,9 @@ public class StockController : ControllerBase {
 
     [HttpGet]
     public IActionResult GetAll() {
-        return Ok(_context.Stocks.ToList());
+        return Ok(_context.Stocks
+                                 .Select(st => st.ToStockDto())
+                                 .ToList());
     }
 
     [HttpGet("{id}")]
@@ -24,7 +27,7 @@ public class StockController : ControllerBase {
         if (stock is null) {
             return NotFound();
         }
-
-        return Ok(stock);
+        
+        return Ok(stock.ToStockDto());
     }
 }
