@@ -22,4 +22,17 @@ public static class CommentMapper {
             CreatedOn = comment.CreatedOn
         };
     }
+
+    public static Comment ToCommentFromCreate(this CreateCommentDto commentDto, int stockId) {
+        return new() {
+            Title = commentDto.Title,
+            Content = commentDto.Content,
+            StockId = stockId
+        };
+    }
+
+    public static void Update(this Comment comment, UpdateCommentDto commentDto) {
+        comment.Title = commentDto.Title;
+        comment.Content = commentDto.Content;
+    }
 }
