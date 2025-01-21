@@ -1,3 +1,5 @@
+using WebApplication3.Dtos.Comment;
+
 namespace WebApplication3.Dtos.Stock;
 
 public class StockDto {
@@ -8,4 +10,5 @@ public class StockDto {
     public decimal LastDir { get; set; }
     public string Industry { get; set; } = string.Empty;
     public long MarketCap { get; set; }
+    public List<CommentShortDto> Comments { get; set; }
 }

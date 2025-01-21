@@ -12,7 +12,8 @@ public static class StockMapper {
             Purchase = stock.Purchase,
             LastDir = stock.LastDir,
             Industry = stock.Industry,
-            MarketCap = stock.MarketCap
+            MarketCap = stock.MarketCap,
+            Comments = stock.Comments.Select(com => com.ToCommentShortDto()).ToList()
         };
     }
 
