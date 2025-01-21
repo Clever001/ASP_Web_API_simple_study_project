@@ -1,4 +1,3 @@
-using api.Data;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication3.Dtos.Stock;
 using WebApplication3.Interfaces;
