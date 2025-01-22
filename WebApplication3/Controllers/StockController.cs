@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using WebApplication3.Dtos.Stock;
+using WebApplication3.Helpers;
 using WebApplication3.Interfaces;
 using WebApplication3.Mappers;
 
@@ -15,12 +16,12 @@ public class StockController : ControllerBase {
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll() {
-        var stocks = await _stockRepo.GetAllAsync();
+    public async Task<IActionResult> GetAll([FromQuery] StockQuery query) {
+        var stocks = await _stockRepo.GetAllAsync(query);
         return Ok(stocks.Select(st => st.ToStockDto()));
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById([FromRoute] int id) {
         var stock = await _stockRepo.GetByIdAsync(id);
         if (stock is null) {
@@ -32,12 +33,15 @@ public class StockController : ControllerBase {
 
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateStockDto createStockDto) {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+        
         var stock = await _stockRepo.CreateAsync(createStockDto.ToStockFromCreateDto());
         return CreatedAtAction(nameof(GetById), new { id = stock.Id }, stock.ToStockDto());
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:int}")]
     public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateStockDto updateStockDto) {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
         var stock = await _stockRepo.UpdateAsync(id, updateStockDto);
         if (stock is null) {
             return NotFound();
@@ -45,7 +49,7 @@ public class StockController : ControllerBase {
         return Ok(stock.ToStockDto());
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete([FromRoute] int id) {
         if (await _stockRepo.DeleteAsync(id) is not null) {
             return NoContent();

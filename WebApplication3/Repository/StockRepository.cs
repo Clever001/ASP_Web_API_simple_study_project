@@ -2,6 +2,7 @@ using api.Data;
 using api.Models;
 using Microsoft.EntityFrameworkCore;
 using WebApplication3.Dtos.Stock;
+using WebApplication3.Helpers;
 using WebApplication3.Interfaces;
 using WebApplication3.Mappers;
 
@@ -14,8 +15,37 @@ public class StockRepository : IStockRepository {
         _context = context;
     }
     
-    public async Task<List<Stock>> GetAllAsync() {
-        return await _context.Stocks.Include(st => st.Comments).ToListAsync();
+    public async Task<List<Stock>> GetAllAsync(StockQuery query) {
+        var stocks = _context.Stocks.Include(st => st.Comments).AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(query.Symbol)) {
+            var upperInvariant = query.Symbol.ToUpper();
+            stocks = stocks.Where(st => st.Symbol.ToUpper().Contains(upperInvariant));
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.CompanyName)) {
+            var upperInvariant = query.CompanyName.ToUpper();
+            stocks = stocks.Where(st => st.CompanyName.ToUpper().Contains(upperInvariant));
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.OrderBy)) {
+            if (string.Equals(query.OrderBy, "symbol", StringComparison.InvariantCultureIgnoreCase)) {
+                stocks = query.IsDescending ? 
+                    stocks.OrderByDescending(st => st.Symbol) : stocks.OrderBy(st => st.Symbol);
+            }
+            else if (string.Equals(query.OrderBy, "companyName", StringComparison.InvariantCultureIgnoreCase)) {
+                stocks = query.IsDescending ? 
+                    stocks.OrderByDescending(st => st.CompanyName) : stocks.OrderBy(st => st.CompanyName);
+            }
+        }
+        
+        int skipNum = (query.PageNumber - 1) * query.PageSize;
+        query.PageSize = Math.Min(query.PageSize, 20);
+
+        if (skipNum < 1) skipNum = 0;
+        if (query.PageSize < 1) query.PageSize = 10;
+        
+        return await stocks.Skip(skipNum).Take(query.PageSize).ToListAsync();
     }
 
     public async Task<Stock?> GetByIdAsync(int id) {
