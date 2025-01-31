@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication3.Dtos.Comment;
 using WebApplication3.Dtos.Stock;
@@ -7,7 +8,7 @@ using WebApplication3.Mappers;
 namespace WebApplication3.Controllers;
 
 [Route("api/comment")]
-[Controller]
+[ApiController]
 public class CommentController : ControllerBase {
     private readonly ICommentRepository _commentRepo;
     private readonly IStockRepository _stockRepo;
@@ -18,6 +19,7 @@ public class CommentController : ControllerBase {
     }
 
     [HttpGet]
+    [Authorize]
     public async Task<IActionResult> GetAll() {
         var comments = await _commentRepo.GetAll();
 
@@ -25,6 +27,7 @@ public class CommentController : ControllerBase {
     }
 
     [HttpGet("{id:int}")]
+    [Authorize]
     public async Task<IActionResult> GetById([FromRoute] int id) {
         var comment = await _commentRepo.GetById(id);
         if (comment is null) {
@@ -35,6 +38,7 @@ public class CommentController : ControllerBase {
     }
 
     [HttpPost("{stockId:int}")]
+    [Authorize]
     public async Task<IActionResult> Create([FromRoute] int stockId, [FromBody] CreateCommentDto commentDto) {
         if (!ModelState.IsValid) return BadRequest(ModelState);
         
@@ -48,6 +52,7 @@ public class CommentController : ControllerBase {
     }
 
     [HttpPut("{id:int}")]
+    [Authorize]
     public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateCommentDto commentDto) {
         if (!ModelState.IsValid) return BadRequest(ModelState);
         
@@ -59,6 +64,7 @@ public class CommentController : ControllerBase {
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize]
     public async Task<IActionResult> Delete([FromRoute] int id) {
         var comment = await _commentRepo.DeleteAsync(id);
         if (comment is null) {
